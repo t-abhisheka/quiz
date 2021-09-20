@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:quiz/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() {
-  runApp(MaterialApp(
-    home: Scaffold(
-      backgroundColor: Colors.black54,
-      body: quizapp(),
-    ),
-  ));
+  runApp(
+      MaterialApp(
+        home: Scaffold(
+          backgroundColor: Colors.black54,
+          body: quizapp(),
+        ),
+      )
+  );
 }
 
 class quizapp extends StatefulWidget {
@@ -17,11 +20,36 @@ class quizapp extends StatefulWidget {
 
 class _quizappState extends State<quizapp> {
   @override
+
   QuizBrain qb = new QuizBrain();
 
-  void checker(bool x) {
-    if (qb.getQuestionAwnser() == x) {
-      if (qb.lengthExceed()) {
+  void alert(){
+    int x = qb.getCorrectCount();
+    Alert(
+      context: context,
+      title: "Quiz End",
+      desc: "You have successfull awnsered $x questions.",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Reset",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            setState(() {
+              qb.reset();
+            });
+          },
+          width: 120,
+        )
+      ],
+    ).show();
+  }
+
+  void checker(bool x){
+    if(qb.getQuestionAwnser() == x){
+      if(qb.lengthExceed()) {
         setState(() {
           qb.scoreKeeper.add(
             Icon(
@@ -32,11 +60,12 @@ class _quizappState extends State<quizapp> {
           qb.countup();
           qb.incrimentQuestionNumber();
         });
-      } else {
-        qb.endAlert();
+      }else{
+        qb.countup();
+        alert();
       }
-    } else {
-      if (qb.lengthExceed()) {
+    }else{
+      if(qb.lengthExceed()) {
         setState(() {
           qb.scoreKeeper.add(
             Icon(
@@ -46,8 +75,8 @@ class _quizappState extends State<quizapp> {
           );
           qb.incrimentQuestionNumber();
         });
-      } else {
-        qb.endAlert();
+      }else{
+        alert();
       }
     }
   }
@@ -88,7 +117,7 @@ class _quizappState extends State<quizapp> {
                       fontSize: 20.0,
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: (){
                     checker(true);
                   },
                 ),
@@ -107,7 +136,7 @@ class _quizappState extends State<quizapp> {
                       fontSize: 20.0,
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: (){
                     checker(false);
                   },
                 ),
